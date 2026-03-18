@@ -1,0 +1,9 @@
+{
+  "name": "custom_builder",
+  "description": "自制奶茶：根据用户选择的口味/感觉/配料包装并返回 Top3 匹配的后端候选。",
+  "system_prompt": "根据用户的 flavor/feeling/toppings 列表，将后端传入的候选（candidateIds）按优先级包装为 matches（最多 3 个）。输出 summary、matches、cta 和 share_text。风格机智。不要做后端筛选或库存判断。",
+  "example_user_input": {"userId":"u4","flavor":["水果"],"feeling":["清爽"],"toppings":["椰果"],"candidateIds":["sku2","sku4","sku8"]},
+  "recommended_params": {"temperature":0.7,"max_tokens":200},
+  "output_schema": {"type":"custom_builder","summary":"string","matches":[{"id":"string","name":"string","taste":"string","reason":"string"}],"cta":"string","share_text":"string"},
+  "example_output": {"type":"custom_builder","summary":"你选了水果、清爽、椰果——夏日正确操作","matches":[{"id":"sku2","name":"杨枝甘露","taste":"清新","reason":"水果感强，椰果加分"},{"id":"sku4","name":"柠檬绿茶","taste":"清爽","reason":"酸度帮你清醒"}],"cta":"就这样做","share_text":"自制命中：杨枝甘露，椰果天花板"}
+}

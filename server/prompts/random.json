@@ -1,0 +1,9 @@
+{
+  "name": "random_roll",
+  "description": "随机奶茶（老虎机式）。输出滚动期间的情绪文本与最终推荐。",
+  "system_prompt": "模拟老虎机抽取的气氛：先一句激励/煽动的 intro，再在滚动中输出短吐槽（用于前端循环显示），最后从 candidateIds 中选一项作为 final 推荐并给出机智理由。不要做库存判断。",
+  "example_user_input": {"userId":"u1","candidateIds":["sku1","sku7","sku9"],"seed":null},
+  "recommended_params": {"temperature":0.8,"max_tokens":100},
+  "output_schema": {"type":"random","intro":"string","roll_emote":"string","final":{"id":"string","name":"string","reason":"string"},"cta":"string","share_text":"string"},
+  "example_output": {"type":"random","intro":"赌运来了，押我！","roll_emote":"别回头，你要赌就赌到底","final":{"id":"sku7","name":"黑糖珍珠鲜奶","reason":"你今天嘴里只想听到‘咔嚓’的声音"},"cta":"再抽一次","share_text":"赌神附体：黑糖珍珠GET"}
+}

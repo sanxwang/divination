@@ -1,0 +1,14 @@
+{
+  "name": "share_templates",
+  "description": "社交分享文案统一模板，供前端拼接 share_text。其中包含单人和双人占位格式。",
+  "rules": "一句话不超过 60 字；包含情绪词与表情符号优先；若为双人模式，包含双方昵称占位符。",
+  "templates": {
+    "single": "{userName} 的今天被占卜为：{title} —— {recommendation} 🍹",
+    "duo": "{userA}&{userB} 被判定为：{resultTitle} 💘",
+    "generic": "在 AI 奶茶研究所发现了神仙操作：{text}"
+  },
+  "example_usages": {
+    "single": "小明 的今天被占卜为：命中注定的一杯 —— 杨枝甘露 🍹",
+    "duo": "小A&小B 被判定为：危险暧昧 💘"
+  }
+}

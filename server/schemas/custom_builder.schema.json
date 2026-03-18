@@ -1,0 +1,12 @@
+{
+  "$id": "custom_builder.schema.json",
+  "type": "object",
+  "properties": {
+    "type": {"const":"custom_builder"},
+    "summary": {"type":"string"},
+    "matches": {"type":"array","items":{"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"taste":{"type":"string"},"reason":{"type":"string"}},"required":["id","name","reason"]}},
+    "cta": {"type":"string"},
+    "share_text": {"type":"string"}
+  },
+  "required":["type","summary","matches"]
+}

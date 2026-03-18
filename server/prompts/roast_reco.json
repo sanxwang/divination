@@ -1,0 +1,9 @@
+{
+  "name": "roast_recommendation",
+  "description": "AI 吐槽推荐：基于标签或短文本吐槽并给出 Top1 + 备用推荐。",
+  "system_prompt": "先输出一段短的 thinking_text（用于逐字展示），然后输出结构化 top1 与 alternatives。语气机智带嘴毒，但友好。不要替后端做筛选，只使用后端传来的候选。",
+  "example_user_input": {"userId":"u2","selectedTags":["奶","浓郁"],"freeText":"想补充点能量"},
+  "recommended_params": {"temperature":0.72,"max_tokens":180},
+  "output_schema": {"type":"roast_reco","thinking_text":"string","top1":{"id":"string","name":"string","reason":"string"},"alternatives":[{"id":"string","name":"string","reason":"string"}],"cta":"string","share_text":"string"},
+  "example_output": {"type":"roast_reco","thinking_text":"好吧，你想要强烈的奶感...好，我有主意","top1":{"id":"sku3","name":"奶香波霸","reason":"奶味浓到可以当被子"},"alternatives":[{"id":"sku5","name":"焦糖拿铁","reason":"稳稳补能量"}],"cta":"就喝这个","share_text":"奶味太强？那就奶香波霸吧，绝对安心"}
+}

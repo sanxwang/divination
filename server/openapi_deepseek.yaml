@@ -1,0 +1,116 @@
+openapi: 3.0.3
+info:
+  title: AI 奶茶研究所 - DeepSeek Prompt API (示例)
+  version: 1.0.0
+  description: |
+    示例 OpenAPI，用于展示如何把 `server/prompts/*.json` 的 prompts 通过 DeepSeek 调用。
+servers:
+  - url: https://api.deepseek.example
+security:
+  - DeepSeekApiKey: []
+components:
+  securitySchemes:
+    DeepSeekApiKey:
+      type: apiKey
+      in: header
+      name: X-DeepSeek-Key
+  schemas:
+    DivinationRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        contextTags:
+          type: array
+          items:
+            type: string
+        candidateIds:
+          type: array
+          items:
+            type: string
+      required: [userId, candidateIds]
+    DivinationResponse:
+      type: object
+      properties:
+        type: { type: string }
+        headline: { type: string }
+        mystic_reason: { type: string }
+        recommendation:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            reason: { type: string }
+        cta: { type: string }
+        share_text: { type: string }
+paths:
+  /api/divination:
+    post:
+      summary: 今日奶茶占卜 - 使用 DeepSeek 生成文案
+      security:
+        - DeepSeekApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DivinationRequest'
+            example:
+              userId: "demo_user"
+              contextTags: ["下午","想要甜"]
+              candidateIds: ["sku1","sku2","sku3"]
+      responses:
+        '200':
+          description: 占卜结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DivinationResponse'
+              example:
+                type: divination
+                headline: "命中注定的一杯"
+                mystic_reason: "星盘显示你今天甜度过剩，需要点解药。"
+                recommendation:
+                  id: "sku2"
+                  name: "杨枝甘露"
+                  reason: "甜到犯规，正好治你今天的糖瘾"
+                cta: "就喝这个"
+                share_text: "今天被命运选中喝杨枝甘露，运气+1"
+
+  /internal/deepseek/generate:
+    post:
+      summary: （示例）将 prompt 转发给 DeepSeek 的代理端点
+      description: |
+        这个端点展示后端如何把 persona + prompt system 拼接并调用 DeepSeek API。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                system:
+                  type: string
+                prompt:
+                  type: string
+                model:
+                  type: string
+                temperature:
+                  type: number
+            example:
+              system: "<persona system prompt>\n<divination system prompt>"
+              prompt: '{"userId":"demo","candidateIds":["sku1","sku2"]}'
+              model: "deepseek-mini"
+              temperature: 0.75
+      responses:
+        '200':
+          description: DeepSeek 返回（原始）
+          content:
+            application/json:
+              example:
+                reply: '{"type":"divination","headline":"...","recommendation":{}}'
+
+x-note: |
+  DeepSeek 的真实 API参数和路径请替换为你拿到的官方文档。本例给出一个可执行的后端代理设计：
+  - 后端接收业务 payload（如 /api/divination），由后端负责拼接 systemPrompt 和 userPrompt，
+  - 调用 DeepSeek（见 /internal/deepseek/generate），最终将 DeepSeek 的 JSON 响应验证并返回给前端。

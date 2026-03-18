@@ -1,0 +1,13 @@
+{
+  "$id": "personality.schema.json",
+  "type": "object",
+  "properties": {
+    "type": {"const":"personality"},
+    "profileId": {"type":"string"},
+    "title": {"type":"string"},
+    "description": {"type":"string"},
+    "recommendation": {"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"reason":{"type":"string"}},"required":["id","name","reason"]},
+    "share_text": {"type":"string"}
+  },
+  "required":["type","profileId","title","description","recommendation"]
+}

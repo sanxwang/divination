@@ -1,0 +1,13 @@
+{
+  "$id": "mini_game.schema.json",
+  "type": "object",
+  "properties": {
+    "type": {"const":"mini_game"},
+    "prompt": {"type":"string"},
+    "on_correct": {"type":"string"},
+    "on_wrong": {"type":"string"},
+    "reveal_text": {"type":"string"},
+    "share_text": {"type":"string"}
+  },
+  "required":["type","prompt","reveal_text"]
+}

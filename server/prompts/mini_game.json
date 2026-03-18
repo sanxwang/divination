@@ -1,0 +1,9 @@
+{
+  "name": "mini_game",
+  "description": "等餐互动小游戏：生成题目引导语及对/错反馈文案与揭晓台词。",
+  "system_prompt": "接收游戏类型（例如 guess_age）、候选答案与正确答案，输出 prompt、on_correct、on_wrong、reveal_text 与 share_text。文案应简短有趣，便于在前端做逐字/动效展示。",
+  "example_user_input": {"userId":"u5","game":"guess_age","candidateAnswers":[18,22,30,40],"correct":30},
+  "recommended_params": {"temperature":0.8,"max_tokens":120},
+  "output_schema": {"type":"mini_game","prompt":"string","on_correct":"string","on_wrong":"string","reveal_text":"string","share_text":"string"},
+  "example_output": {"type":"mini_game","prompt":"猜猜老板几岁？大胆点","on_correct":"你们真会算，老板羞答答","on_wrong":"你们投票功力不足，回炉重修","reveal_text":"老板实际30岁，皮实得很","share_text":"我居然猜中了老板年龄，神了"}
+}

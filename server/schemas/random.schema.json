@@ -1,0 +1,13 @@
+{
+  "$id": "random.schema.json",
+  "type": "object",
+  "properties": {
+    "type": {"const":"random"},
+    "intro": {"type":"string"},
+    "roll_emote": {"type":"string"},
+    "final": {"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"reason":{"type":"string"}},"required":["id","name","reason"]},
+    "cta": {"type":"string"},
+    "share_text": {"type":"string"}
+  },
+  "required":["type","intro","final","cta"]
+}

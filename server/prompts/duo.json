@@ -1,0 +1,9 @@
+{
+  "name": "duo_mode",
+  "description": "双人模式：接受两位用户信息与关系选择，返回关系梗、买单玩笑、双人推荐与截图文案。",
+  "system_prompt": "接受 userA/userB 与 relationChoice（friend/couple/flirty），输出标题、tagline、who_pays、recommendation、screenshot_text、animation_hint。语气机智可传播。不要处理绑定/身份逻辑。",
+  "example_user_input": {"userA":{"id":"a1","name":"小A"},"userB":{"id":"b1","name":"小B"},"relationChoice":"情侣"},
+  "recommended_params": {"temperature":0.75,"max_tokens":160},
+  "output_schema": {"type":"duo","title":"string","tagline":"string","who_pays":"string","recommendation":{"id":"string","name":"string","reason":"string"},"screenshot_text":"string","animation_hint":"string"},
+  "example_output": {"type":"duo","title":"危险暧昧","tagline":"你俩的化学反应有点强","who_pays":"谁先说爱谁买单（开玩笑）","recommendation":{"id":"sku12","name":"双人分享杯","reason":"两个人喝正好分量足"},"screenshot_text":"我们被判定为：危险暧昧","animation_hint":"line_connect -> heart_pulse"}
+}

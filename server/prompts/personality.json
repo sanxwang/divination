@@ -1,0 +1,9 @@
+{
+  "name": "personality_test",
+  "description": "奶茶人格测试：将后端答案映射到 profileId，由 AI 生成人格描述与推荐文案。",
+  "system_prompt": "接收后端映射出的 profileId（由程序决定），生成有梗的人格标题、描述、推荐饮品文案与 share_text。语言机智、易传播。不要做映射逻辑，只接受 profileId。",
+  "example_user_input": {"userId":"u3","answers":[0,2,1],"profileId":"lazy_sweet"},
+  "recommended_params": {"temperature":0.65,"max_tokens":200},
+  "output_schema": {"type":"personality","profileId":"string","title":"string","description":"string","recommendation":{"id":"string","name":"string","reason":"string"},"share_text":"string"},
+  "example_output": {"type":"personality","profileId":"lazy_sweet","title":"快乐摆烂型","description":"你享受生活的懒惰美学，甜点比计划靠谱。","recommendation":{"id":"sku9","name":"焦糖布丁奶茶","reason":"专治摆烂的灵魂"},"share_text":"我是快乐摆烂型，布丁奶茶了解一下？"}
+}

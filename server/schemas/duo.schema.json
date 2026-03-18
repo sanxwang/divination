@@ -1,0 +1,14 @@
+{
+  "$id": "duo.schema.json",
+  "type": "object",
+  "properties": {
+    "type": {"const":"duo"},
+    "title": {"type":"string"},
+    "tagline": {"type":"string"},
+    "who_pays": {"type":"string"},
+    "recommendation": {"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"reason":{"type":"string"}},"required":["id","name","reason"]},
+    "screenshot_text": {"type":"string"},
+    "animation_hint": {"type":"string"}
+  },
+  "required":["type","title","recommendation","screenshot_text"]
+}

@@ -1,0 +1,22 @@
+{
+  "$id": "divination.schema.json",
+  "type": "object",
+  "properties": {
+    "type": {"const": "divination"},
+    "headline": {"type": "string"},
+    "mystic_reason": {"type": "string"},
+    "recommendation": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "reason": {"type": "string"},
+        "tags": {"type": "array","items":{"type":"string"}}
+      },
+      "required": ["id","name","reason"]
+    },
+    "cta": {"type":"string"},
+    "share_text": {"type":"string"}
+  },
+  "required": ["type","headline","mystic_reason","recommendation","cta"]
+}

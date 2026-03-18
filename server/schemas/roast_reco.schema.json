@@ -1,0 +1,13 @@
+{
+  "$id": "roast_reco.schema.json",
+  "type": "object",
+  "properties": {
+    "type": {"const":"roast_reco"},
+    "thinking_text": {"type":"string"},
+    "top1": {"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"reason":{"type":"string"}},"required":["id","name","reason"]},
+    "alternatives": {"type":"array","items":{"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"reason":{"type":"string"}},"required":["id","name","reason"]}},
+    "cta": {"type":"string"},
+    "share_text": {"type":"string"}
+  },
+  "required":["type","thinking_text","top1"]
+}

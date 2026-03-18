@@ -1,0 +1,40 @@
+{
+  "info": {
+    "name": "AI奶茶研究所 - DeepSeek 示例",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "DeepSeek - Generate (示例)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-DeepSeek-Key", "value": "{{DEEPSEEK_API_KEY}}" }
+        ],
+        "url": { "raw": "https://api.deepseek.example/v1/generate", "protocol": "https", "host": ["api","deepseek","example"], "path": ["v1","generate"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"deepseek-mini\",\n  \"system\": \"<persona system prompt>\\n<divination system prompt>\",\n  \"prompt\": \"{\\\"userId\\\":\\\"demo_user\\\",\\\"candidateIds\\\":[\\\"sku1\\\",\\\"sku2\\\"]}\",\n  \"temperature\": 0.75\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Proxy - /api/divination (本地后端示例)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "url": { "raw": "http://localhost:3000/api/divination", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api","divination"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"demo_user\",\n  \"contextTags\": [\"下午\", \"想要甜\"],\n  \"candidateIds\": [\"sku1\", \"sku2\", \"sku3\"]\n}"
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    { "key": "DEEPSEEK_API_KEY", "value": "your_deepseek_key_here" }
+  ]
+}
