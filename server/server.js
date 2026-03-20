@@ -5,6 +5,9 @@ const path = require('path');
 const fetch = require('node-fetch');
 const { Pool } = require('pg');
 
+// Note: dynamically import modelManager using require() when needed
+// since this file uses CommonJS and modelManager is TypeScript
+
 // Load .env manually
 const envPath = path.join(__dirname, '..', '.env');
 if (fs.existsSync(envPath)) {
@@ -37,6 +40,33 @@ app.use((req, res, next) => {
 const DEEPSEEK_API_URL = process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1';
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 
+// Model Management Configuration
+const AVAILABLE_MODELS = {
+  deepseek: {
+    name: 'DeepSeek',
+    endpoint: DEEPSEEK_API_URL || 'https://api.deepseek.com/v1',
+    key: DEEPSEEK_API_KEY,
+    isAvailable: !!DEEPSEEK_API_KEY,
+    model: process.env.DEEPSEEK_MODEL || 'deepseek-chat'
+  },
+  mimo: {
+    name: 'Xiaomi MiMo',
+    endpoint: process.env.MIMO_API_URL || 'https://api.xiaomimimo.com/v1',
+    key: process.env.MIMO_API_KEY || '',
+    isAvailable: !!process.env.MIMO_API_KEY,
+    model: process.env.MIMO_MODEL || 'mimo-v2-pro'
+  },
+  openai: {
+    name: 'OpenAI',
+    endpoint: process.env.OPENAI_API_URL || 'https://api.openai.com/v1',
+    key: process.env.OPENAI_API_KEY || '',
+    isAvailable: !!process.env.OPENAI_API_KEY,
+    model: process.env.OPENAI_MODEL || 'gpt-4o-mini'
+  }
+};
+
+const DEFAULT_MODEL = process.env.DEFAULT_MODEL || 'deepseek';
+
 const pool = new Pool({ connectionString: process.env.DATABASE_URL || process.env.PG_CONNECTION || '' });
 
 function loadPrompt(name) {
@@ -46,13 +76,51 @@ function loadPrompt(name) {
 }
 
 async function callDeepSeek(system, prompt, params = {}) {
-  // Support both mock API format and real Deepseek API format
-  const isRealAPI = DEEPSEEK_API_URL.includes('api.deepseek.com');
+  return callModel('deepseek', system, prompt, params);
+}
+
+async function callModel(modelProvider, system, prompt, params = {}) {
+  const provider = AVAILABLE_MODELS[modelProvider] || AVAILABLE_MODELS[DEFAULT_MODEL];
   
-  if (isRealAPI) {
-    // Real Deepseek API uses OpenAI-compatible format
+  if (!provider.isAvailable) {
+    throw new Error(`Model provider ${modelProvider} is not available. Set required environment variables.`);
+  }
+
+  // Both mock API and OpenAI-compatible format are handled
+  const isRealAPI = provider.endpoint.includes('api.deepseek.com') || 
+                    provider.endpoint.includes('api.openai.com') ||
+                    provider.endpoint.includes('api.xiaomimimo.com');
+  
+  if (!isRealAPI && modelProvider === 'deepseek') {
+    // Mock API format (for testing with local mock server)
     const body = {
-      model: params.model || 'deepseek-chat',
+      model: params.model || provider.model,
+      system,
+      prompt,
+      temperature: params.temperature || 0.7,
+      top_p: params.top_p || 0.9
+    };
+    const res = await fetch(provider.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-DeepSeek-Key': provider.key
+      },
+      body: JSON.stringify(body),
+      timeout: params.timeoutMs || 8000
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`${modelProvider} error ${res.status}: ${txt}`);
+    }
+    const j = await res.json();
+    if (typeof j.reply === 'string') return j.reply;
+    if (j.output) return typeof j.output === 'string' ? j.output : JSON.stringify(j.output);
+    return JSON.stringify(j);
+  } else {
+    // OpenAI-compatible API format (real APIs)
+    const body = {
+      model: params.model || provider.model,
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: prompt }
@@ -61,49 +129,30 @@ async function callDeepSeek(system, prompt, params = {}) {
       top_p: params.top_p || 0.9,
       max_tokens: params.max_tokens || 500
     };
-    const res = await fetch(DEEPSEEK_API_URL + '/chat/completions', {
+    
+    const endpoint = provider.endpoint.endsWith('/') 
+      ? provider.endpoint + 'chat/completions' 
+      : provider.endpoint + '/chat/completions';
+    
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        'Authorization': `Bearer ${provider.key}`
       },
       body: JSON.stringify(body),
       timeout: params.timeoutMs || 20000
     });
+    
     if (!res.ok) {
       const txt = await res.text();
-      throw new Error(`DeepSeek error ${res.status}: ${txt}`);
+      throw new Error(`${modelProvider} error ${res.status}: ${txt}`);
     }
+    
     const j = await res.json();
     if (j.choices && j.choices[0] && j.choices[0].message) {
       return j.choices[0].message.content;
     }
-    return JSON.stringify(j);
-  } else {
-    // Mock API format
-    const body = {
-      model: params.model || 'deepseek-mini',
-      system,
-      prompt,
-      temperature: params.temperature || 0.7,
-      top_p: params.top_p || 0.9
-    };
-    const res = await fetch(DEEPSEEK_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-DeepSeek-Key': DEEPSEEK_API_KEY
-      },
-      body: JSON.stringify(body),
-      timeout: params.timeoutMs || 8000
-    });
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`DeepSeek error ${res.status}: ${txt}`);
-    }
-    const j = await res.json();
-    if (typeof j.reply === 'string') return j.reply;
-    if (j.output) return typeof j.output === 'string' ? j.output : JSON.stringify(j.output);
     return JSON.stringify(j);
   }
 }
@@ -218,10 +267,23 @@ app.get('/api/divination-context', (req, res) => {
 app.post('/api/prompt/:name', checkKey, async (req, res) => {
   try {
     const name = req.params.name;
+    const modelProvider = req.query.model || req.body.model || DEFAULT_MODEL;
+    
+    // Validate model provider
+    if (!AVAILABLE_MODELS[modelProvider]) {
+      const available = Object.keys(AVAILABLE_MODELS).filter(m => AVAILABLE_MODELS[m].isAvailable);
+      return res.status(400).json({ 
+        ok: false, 
+        error: `Invalid model: ${modelProvider}. Available: ${available.join(', ')}` 
+      });
+    }
+    
     const promptMeta = loadPrompt(name);
     const system = composeSystem(persona.system_prompt, promptMeta.system_prompt);
     const userPrompt = JSON.stringify(req.body || {});
-    const reply = await callDeepSeek(system, userPrompt, promptMeta.recommended_params || {});
+    
+    // Use callModel with the specified provider
+    const reply = await callModel(modelProvider, system, userPrompt, promptMeta.recommended_params || {});
     try {
       // Clean markdown code blocks if present
       let cleanedReply = reply.trim();
@@ -231,10 +293,33 @@ app.post('/api/prompt/:name', checkKey, async (req, res) => {
       }
       const parsed = JSON.parse(cleanedReply || '{}');
       // best-effort persist
-      try { await pool.query('INSERT INTO prompt_logs(user_id, session_id, prompt_name, user_payload, llm_response, valid) VALUES($1,$2,$3,$4,$5,$6)', [req.body.userId||null, req.body.sessionId||null, name, req.body||{}, parsed||{}, true]); } catch (e) { console.warn('log failed', e.message); }
-      return res.json({ ok: true, parsed });
-    } catch (e) { return res.json({ ok: true, raw: reply }); }
+      try { await pool.query('INSERT INTO prompt_logs(user_id, session_id, prompt_name, user_payload, llm_response, valid, model_provider) VALUES($1,$2,$3,$4,$5,$6,$7)', [req.body.userId||null, req.body.sessionId||null, name, req.body||{}, parsed||{}, true, modelProvider]); } catch (e) { console.warn('log failed', e.message); }
+      return res.json({ ok: true, parsed, model: modelProvider });
+    } catch (e) { return res.json({ ok: true, raw: reply, model: modelProvider }); }
   } catch (err) { console.error(err); return res.status(500).json({ ok: false, error: String(err) }); }
+});
+
+// API endpoint to get available models
+app.get('/api/models', (req, res) => {
+  try {
+    const models = Object.entries(AVAILABLE_MODELS)
+      .filter(([_, config]) => config.isAvailable)
+      .map(([key, config]) => ({
+        id: key,
+        name: config.name,
+        model: config.model,
+        isDefault: key === DEFAULT_MODEL
+      }));
+    
+    res.json({ 
+      ok: true, 
+      models,
+      default: DEFAULT_MODEL 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: String(err) });
+  }
 });
 
 app.get('/products', async (req, res) => {

@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import ProductCard from '../components/ProductCard'
 
-type Product = {
-  id: string;
-  name: string;
-  price_cents: number;
-  metadata?: any;
-}
-
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [cart, setCart] = useState<Record<string, number>>({})
+  const [products, setProducts] = useState([])
+  const [cart, setCart] = useState({})
   const apiBase = import.meta.env.VITE_API_URL || ''
 
   useEffect(() => {
@@ -20,11 +13,11 @@ export default function ProductsPage() {
       .catch(err => console.error('fetch products', err))
   }, [])
 
-  function add(id: string) {
+  function add(id) {
     setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
   }
 
-  function remove(id: string) {
+  function remove(id) {
     setCart(prev => {
       const copy = { ...prev }
       if (!copy[id]) return prev

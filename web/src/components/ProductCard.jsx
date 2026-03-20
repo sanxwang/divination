@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ProductCard({ product, onAdd }: any) {
+export default function ProductCard({ product, onAdd }) {
   return (
     <div className="product-card">
       <div className="thumb">{product.metadata?.image ? <img src={product.metadata.image} alt={product.name} /> : null}</div>

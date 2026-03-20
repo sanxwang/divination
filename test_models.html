@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多模型测试 - AI奶茶研究所</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .section {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .section:last-child {
+      border-bottom: none;
+    }
+    .control-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .status {
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      display: none;
+    }
+    .status.loading {
+      background: #e3f2fd;
+      color: #0066cc;
+      display: block;
+    }
+    .status.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+    }
+    .status.error {
+      background: #ffebee;
+      color: #c62828;
+      display: block;
+    }
+    .model-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+    }
+    .model-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fafafa;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .model-card:hover {
+      border-color: #0066cc;
+      background: #f0f7ff;
+    }
+    .model-card h3 {
+      margin: 0 0 5px 0;
+      font-size: 16px;
+      color: #333;
+    }
+    .model-card p {
+      margin: 0;
+      font-size: 12px;
+      color: #666;
+    }
+    .badge {
+      display: inline-block;
+      background: #fff3cd;
+      color: #856404;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 多模型测试工具</h1>
+    <p class="subtitle">AI奶茶研究所 - 模型切换功能演示</p>
+
+    <!-- Section 1: 模型列表 -->
+    <div class="section">
+      <h2>📊 可用模型</h2>
+      <button onclick="fetchModels()">刷新模型列表</button>
+      <div id="modelList" class="model-list"></div>
+      <div id="modelStatus" class="status"></div>
+    </div>
+
+    <!-- Section 2: 测试调用 -->
+    <div class="section">
+      <h2>🧪 测试API调用</h2>
+      
+      <div class="control-group">
+        <label>选择模型:</label>
+        <select id="modelSelect">
+          <option value="deepseek">DeepSeek</option>
+          <option value="mimo">Xiaomi MiMo</option>
+          <option value="openai">OpenAI</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>选择提示词:</label>
+        <select id="promptSelect">
+          <option value="random">随机推荐</option>
+          <option value="divination">占卜</option>
+          <option value="personality">人格测试</option>
+          <option value="roast_reco">吐槽推荐</option>
+          <option value="custom_builder">自制奶茶</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>请求负载 (JSON):</label>
+        <textarea id="payload">{
+  "userId": "test-user",
+  "sessionId": "test-session",
+  "contextTags": ["下午", "想要甜"],
+  "candidateIds": ["sku1", "sku2", "sku3"]
+}</textarea>
+      </div>
+
+      <button onclick="testAPI()">发送请求</button>
+      <div id="apiStatus" class="status"></div>
+    </div>
+
+    <!-- Section 3: 响应结果 -->
+    <div class="section">
+      <h2>📝 响应结果</h2>
+      <textarea id="responseOutput" readonly></textarea>
+    </div>
+
+    <!-- Section 4: 测试说明 -->
+    <div class="section">
+      <h2>📖 使用说明</h2>
+      <ul style="line-height: 1.8; color: #555;">
+        <li><strong>Step 1:</strong> 点击"刷新模型列表"查看可用的AI模型</li>
+        <li><strong>Step 2:</strong> 选择要使用的模型和提示词</li>
+        <li><strong>Step 3:</strong> 调整请求负载(可选)</li>
+        <li><strong>Step 4:</strong> 点击"发送请求"测试API调用</li>
+        <li><strong>Step 5:</strong> 在下方查看响应结果</li>
+      </ul>
+      <p style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-top: 15px; color: #856404;">
+        💡 <strong>提示:</strong> 确保服务器正在运行 (localhost:3000)，否则请求会失败
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+
+    async function fetchModels() {
+      const statusEl = document.getElementById('modelStatus');
+      statusEl.className = 'status loading';
+      statusEl.textContent = '⏳ 加载模型列表中...';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/models`);
+        const data = await response.json();
+
+        if (data.ok && data.models.length > 0) {
+          const modelListEl = document.getElementById('modelList');
+          modelListEl.innerHTML = data.models.map(model => `
+            <div class="model-card" onclick="selectModel('${model.id}')">
+              <h3>${model.name}</h3>
+              <p>模型: ${model.model}</p>
+              ${model.isDefault ? '<span class="badge">默认模型</span>' : ''}
+            </div>
+          `).join('');
+
+          statusEl.className = 'status success';
+          statusEl.textContent = `✅ 成功加载 ${data.models.length} 个模型`;
+        } else {
+          statusEl.className = 'status error';
+          statusEl.textContent = '❌ 无可用模型或响应异常';
+        }
+      } catch (error) {
+        statusEl.className = 'status error';
+        statusEl.textContent = `❌ 错误: ${error.message}`;
+      }
+    }
+
+    function selectModel(modelId) {
+      document.getElementById('modelSelect').value = modelId;
+    }
+
+    async function testAPI() {
+      const model = document.getElementById('modelSelect').value;
+      const prompt = document.getElementById('promptSelect').value;
+      const payload = document.getElementById('payload').value;
+      const statusEl = document.getElementById('apiStatus');
+      const outputEl = document.getElementById('responseOutput');
+
+      statusEl.className = 'status loading';
+      statusEl.textContent = '⏳ 发送请求中...';
+      outputEl.value = '';
+
+      try {
+        const data = JSON.parse(payload);
+        const response = await fetch(`${API_BASE}/api/prompt/${prompt}?model=${model}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-DeepSeek-Key': 'sk-3e8f11c6cde74a6da9ce261d31dd69c9'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        outputEl.value = JSON.stringify(result, null, 2);
+
+        if (result.ok) {
+          statusEl.className = 'status success';
+          statusEl.textContent = `✅ 请求成功 (使用模型: ${model})`;
+        } else {
+          statusEl.className = 'status error';
+          statusEl.textContent = `❌ 请求失败: ${result.error || '未知错误'}`;
+        }
+      } catch (error) {
+        statusEl.className = 'status error';
+        statusEl.textContent = `❌ 错误: ${error.message}`;
+        outputEl.value = error.toString();
+      }
+    }
+
+    // 页面加载时自动获取模型列表
+    document.addEventListener('DOMContentLoaded', fetchModels);
+  </script>
+</body>
+</html>

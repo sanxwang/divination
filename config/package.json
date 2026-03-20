@@ -1,0 +1,23 @@
+{
+  "name": "@divination/config",
+  "version": "1.0.0",
+  "description": "统一配置管理模块 - 包含所有占卜系统的 prompts 和 schemas",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "keywords": [
+    "config",
+    "prompts",
+    "schemas",
+    "divination",
+    "tea"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-repo/divination"
+  }
+}

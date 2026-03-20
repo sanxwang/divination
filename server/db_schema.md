@@ -88,6 +88,7 @@ CREATE TABLE prompt_logs (
   user_payload JSONB,
   llm_response JSONB,
   valid BOOLEAN,
+  model_provider TEXT DEFAULT 'deepseek', -- Track which AI model was used
   created_at TIMESTAMPTZ DEFAULT now()
 );
 

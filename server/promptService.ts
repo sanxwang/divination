@@ -1,22 +1,19 @@
-import fs from 'fs';
-import path from 'path';
+import { getPrompt } from './config';
 import { callDeepSeek } from './deepseekClient';
+import { callModel, ModelProvider, getDefaultModel } from './modelManager';
 
-const promptsDir = path.join(__dirname, 'prompts');
+const persona = getPrompt('persona');
 
-function loadPromptJSON(name: string) {
-  const p = path.join(promptsDir, `${name}.json`);
-  const raw = fs.readFileSync(p, 'utf-8');
-  return JSON.parse(raw);
-}
-
-const persona = loadPromptJSON('persona');
-
-export async function runDivination(userPayload: any) {
-  const promptMeta = loadPromptJSON('divination');
+export async function runDivination(userPayload: any, modelProvider?: ModelProvider) {
+  const promptMeta = getPrompt('divination');
   const system = `${persona.system_prompt}\n\n${promptMeta.system_prompt}`;
   const userPrompt = JSON.stringify(userPayload);
-  const reply = await callDeepSeek(system, userPrompt, promptMeta.recommended_params);
+  
+  const provider = modelProvider || getDefaultModel();
+  const reply = provider === 'deepseek' 
+    ? await callDeepSeek(system, userPrompt, promptMeta.recommended_params)
+    : await callModel(provider, system, userPrompt, promptMeta.recommended_params);
+  
   try {
     return JSON.parse(reply || '{}');
   } catch (e) {
@@ -25,51 +22,81 @@ export async function runDivination(userPayload: any) {
   }
 }
 
-export async function runRandomRoll(userPayload: any) {
-  const promptMeta = loadPromptJSON('random');
+export async function runRandomRoll(userPayload: any, modelProvider?: ModelProvider) {
+  const promptMeta = getPrompt('random');
   const system = `${persona.system_prompt}\n\n${promptMeta.system_prompt}`;
   const userPrompt = JSON.stringify(userPayload);
-  const reply = await callDeepSeek(system, userPrompt, promptMeta.recommended_params);
+  
+  const provider = modelProvider || getDefaultModel();
+  const reply = provider === 'deepseek' 
+    ? await callDeepSeek(system, userPrompt, promptMeta.recommended_params)
+    : await callModel(provider, system, userPrompt, promptMeta.recommended_params);
+  
   try { return JSON.parse(reply || '{}'); } catch { return { raw: reply }; }
 }
 
-export async function runRoastReco(userPayload: any) {
-  const promptMeta = loadPromptJSON('roast_reco');
+export async function runRoastReco(userPayload: any, modelProvider?: ModelProvider) {
+  const promptMeta = getPrompt('roast_reco');
   const system = `${persona.system_prompt}\n\n${promptMeta.system_prompt}`;
   const userPrompt = JSON.stringify(userPayload);
-  const reply = await callDeepSeek(system, userPrompt, promptMeta.recommended_params);
+  
+  const provider = modelProvider || getDefaultModel();
+  const reply = provider === 'deepseek' 
+    ? await callDeepSeek(system, userPrompt, promptMeta.recommended_params)
+    : await callModel(provider, system, userPrompt, promptMeta.recommended_params);
+  
   try { return JSON.parse(reply || '{}'); } catch { return { raw: reply }; }
 }
 
-export async function runPersonality(userPayload: any) {
-  const promptMeta = loadPromptJSON('personality');
+export async function runPersonality(userPayload: any, modelProvider?: ModelProvider) {
+  const promptMeta = getPrompt('personality');
   const system = `${persona.system_prompt}\n\n${promptMeta.system_prompt}`;
   const userPrompt = JSON.stringify(userPayload);
-  const reply = await callDeepSeek(system, userPrompt, promptMeta.recommended_params);
+  
+  const provider = modelProvider || getDefaultModel();
+  const reply = provider === 'deepseek' 
+    ? await callDeepSeek(system, userPrompt, promptMeta.recommended_params)
+    : await callModel(provider, system, userPrompt, promptMeta.recommended_params);
+  
   try { return JSON.parse(reply || '{}'); } catch { return { raw: reply }; }
 }
 
-export async function runCustomBuilder(userPayload: any) {
-  const promptMeta = loadPromptJSON('custom_builder');
+export async function runCustomBuilder(userPayload: any, modelProvider?: ModelProvider) {
+  const promptMeta = getPrompt('custom_builder');
   const system = `${persona.system_prompt}\n\n${promptMeta.system_prompt}`;
   const userPrompt = JSON.stringify(userPayload);
-  const reply = await callDeepSeek(system, userPrompt, promptMeta.recommended_params);
+  
+  const provider = modelProvider || getDefaultModel();
+  const reply = provider === 'deepseek' 
+    ? await callDeepSeek(system, userPrompt, promptMeta.recommended_params)
+    : await callModel(provider, system, userPrompt, promptMeta.recommended_params);
+  
   try { return JSON.parse(reply || '{}'); } catch { return { raw: reply }; }
 }
 
-export async function runMiniGame(userPayload: any) {
-  const promptMeta = loadPromptJSON('mini_game');
+export async function runMiniGame(userPayload: any, modelProvider?: ModelProvider) {
+  const promptMeta = getPrompt('mini_game');
   const system = `${persona.system_prompt}\n\n${promptMeta.system_prompt}`;
   const userPrompt = JSON.stringify(userPayload);
-  const reply = await callDeepSeek(system, userPrompt, promptMeta.recommended_params);
+  
+  const provider = modelProvider || getDefaultModel();
+  const reply = provider === 'deepseek' 
+    ? await callDeepSeek(system, userPrompt, promptMeta.recommended_params)
+    : await callModel(provider, system, userPrompt, promptMeta.recommended_params);
+  
   try { return JSON.parse(reply || '{}'); } catch { return { raw: reply }; }
 }
 
-export async function runDuo(userPayload: any) {
-  const promptMeta = loadPromptJSON('duo');
+export async function runDuo(userPayload: any, modelProvider?: ModelProvider) {
+  const promptMeta = getPrompt('duo');
   const system = `${persona.system_prompt}\n\n${promptMeta.system_prompt}`;
   const userPrompt = JSON.stringify(userPayload);
-  const reply = await callDeepSeek(system, userPrompt, promptMeta.recommended_params);
+  
+  const provider = modelProvider || getDefaultModel();
+  const reply = provider === 'deepseek' 
+    ? await callDeepSeek(system, userPrompt, promptMeta.recommended_params)
+    : await callModel(provider, system, userPrompt, promptMeta.recommended_params);
+  
   try { return JSON.parse(reply || '{}'); } catch { return { raw: reply }; }
 }
 

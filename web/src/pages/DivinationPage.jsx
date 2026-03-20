@@ -1,28 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { callDivination } from '../api'
-
-interface DivinationResult {
-  headline: string
-  mystic_reason: string
-  recommendation: {
-    id: string
-    name: string
-    reason: string
-    tags: string[]
-  }
-  cta: string
-  share_text: string
-}
-
-interface MysticContext {
-  date: string
-  dayOfWeek: string
-  moonPhase: { emoji: string; name: string; desc: string }
-  timePhase: { name: string; emoji: string; desc: string }
-  season: { name: string; emoji: string; desc: string }
-  element: { name: string; emoji: string; desc: string }
-  weekNumber: number
-}
 
 const ZODIAC_SIGNS = [
   { name: '白羊', emoji: '♈', value: 'aries' },
@@ -39,17 +17,18 @@ const ZODIAC_SIGNS = [
   { name: '双鱼', emoji: '♓', value: 'pisces' }
 ]
 
-export default function DivinationPage({ onBack }: { onBack: () => void }) {
-  const [selectedZodiac, setSelectedZodiac] = useState<string | null>(null)
-  const [zodiacName, setZodiacName] = useState<string>('')
-  const [step, setStep] = useState<'zodiac' | 'result'>('zodiac')
-  const [mysticContext, setMysticContext] = useState<MysticContext | null>(null)
+export default function DivinationPage() {
+  const navigate = useNavigate()
+  const [selectedZodiac, setSelectedZodiac] = useState(null)
+  const [zodiacName, setZodiacName] = useState('')
+  const [step, setStep] = useState('zodiac')
+  const [mysticContext, setMysticContext] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<DivinationResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState(null)
   const [showConditions, setShowConditions] = useState(false)
 
-  const handleZodiacSelect = async (zodiac: string, name: string) => {
+  const handleZodiacSelect = async (zodiac, name) => {
     setSelectedZodiac(zodiac)
     setZodiacName(name)
     setStep('result')  // 立即跳转到结果页
@@ -116,16 +95,6 @@ export default function DivinationPage({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="divination-page">
-      <button className="back-btn" onClick={() => {
-        if (step === 'result') {
-          setResult(null)
-          setStep('zodiac')
-          setShowConditions(false)
-        } else {
-          onBack()
-        }
-      }} disabled={loading}>← 返回</button>
-
       {step === 'zodiac' && (
         <div className="divination-container">
           <h2 className="divination-title">🔮 今日奶茶占卜</h2>
@@ -243,7 +212,7 @@ export default function DivinationPage({ onBack }: { onBack: () => void }) {
                 <button className="btn-again" onClick={() => { setResult(null); setStep('zodiac'); setShowConditions(false); }} disabled={loading}>
                   🔄 再占一次
                 </button>
-                <button className="btn-back" onClick={onBack} disabled={loading}>🏠 回首页</button>
+                <button className="btn-back" onClick={() => navigate('/')} disabled={loading}>🏠 回首页</button>
               </div>
             </>
           )}
